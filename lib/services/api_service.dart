@@ -25,4 +25,27 @@ class ApiService {
     }
     throw Exception('Failed to load categories');
   }
+
+  Future<List<QuestionModel>> getQuestions(QuizConfig config) async {
+    final queryParams = <String, String>{
+      'amount': config.amount.toString(),
+    };
+    if (config.categoryId != null && config.categoryId! > 0) {
+      queryParams['category'] = config.categoryId.toString();
+    }
+    if (config.difficulty != 'any') {
+      queryParams['difficulty'] = config.difficulty.toLowerCase();
+    }
+    if (config.type != 'any') {
+      queryParams['type'] = config.type.toLowerCase();
+    }
+    final uri = Uri.parse('$_baseUrl/api.php').replace(queryParameters: queryParams);
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>? ?? [];
+      return results.map((e) => QuestionModel.fromJson(e as Map<String, dynamic>)).toList();
+    }
+    throw Exception('Failed to fetch questions');
+  }
 }
