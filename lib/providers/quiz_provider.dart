@@ -49,4 +49,22 @@ class QuizProvider extends ChangeNotifier {
     _prefsService.saveConfig(_config);
     notifyListeners();
   }
+
+  void updateAmount(int amount) {
+    _config = _config.copyWith(amount: amount.clamp(1, 50));
+    _prefsService.saveConfig(_config);
+    notifyListeners();
+  }
+
+  void updateDifficulty(String difficulty) {
+    _config = _config.copyWith(difficulty: difficulty);
+    _prefsService.saveConfig(_config);
+    notifyListeners();
+  }
+
+  void updateType(String type) {
+    _config = _config.copyWith(type: type);
+    _prefsService.saveConfig(_config);
+    notifyListeners();
+  }
 }
