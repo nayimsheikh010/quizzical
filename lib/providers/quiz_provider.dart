@@ -26,6 +26,17 @@ class QuizProvider extends ChangeNotifier {
   QuizConfig _config = const QuizConfig();
   QuizConfig get config => _config;
 
+  List<QuestionModel> _questions = [];
+  List<QuestionModel> get questions => _questions;
+  int _currentIndex = 0;
+  int get currentIndex => _currentIndex;
+  int _score = 0;
+  int get score => _score;
+  bool _isQuizLoading = false;
+  bool get isQuizLoading => _isQuizLoading;
+  String? _quizError;
+  String? get quizError => _quizError;
+
   Future<void> fetchCategories({bool force = false}) async {
     _isLoadingCategories = true;
     _categoryError = null;
@@ -65,6 +76,33 @@ class QuizProvider extends ChangeNotifier {
   void updateType(String type) {
     _config = _config.copyWith(type: type);
     _prefsService.saveConfig(_config);
+    notifyListeners();
+  }
+
+  Future<bool> startQuiz() async {
+    _isQuizLoading = true;
+    _quizError = null;
+    _questions = [];
+    _currentIndex = 0;
+    _score = 0;
+    notifyListeners();
+    try {
+      _questions = await _apiService.getQuestions(_config);
+      _isQuizLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isQuizLoading = false;
+      _quizError = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void resetQuiz() {
+    _questions = [];
+    _currentIndex = 0;
+    _score = 0;
     notifyListeners();
   }
 }
